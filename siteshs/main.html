@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title> Sites indisponibles </title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico" />
+    <!-- Leaflet and Bootstrap: CSS style -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css" />
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+</head>
+<body>
+    <div id="container">
+        <div id="sidebar" class="row align-items-center">
+            <!--
+            <div class="col-sm-auto">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label for="apikey" class="m-2">Clef API: </label>
+                        <input type="text" class="form-control" id="apikey" placeholder="My data.gouv API key">
+                    </div>
+                    <button type="button" class="btn btn-primary m-2" onclick="load()">Confirmer</button>
+                </form>
+            </div>
+            -->
+            <img class="pl-3 pt-2 mx-3 logo" src="logo-arcep.svg" style="height:60px">
+            <div class="col-sm ml-3">
+            <span id="titlespan" class="mr-3 pb-1 align-middle" style="height: 100px;"> Sites indisponibles </span>
+            </div>
+            <div class="col-sm-5 ml-3">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label for="date-choice" class="m-2">Choisissez une date: </label>
+                        <select name="date" id="date-choice" class="form-control m-2" onchange="loadTile()"></select>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="mapid"></div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+<script>
+const opcolor = {
+    'orange': '#ffb200',
+    'bytel' : '#33d1ff',
+    'sfr'   : '#ff0000',
+    'free'  : '#33ff52',
+    }
+
+const opname = {
+    'orange': 'Orange',
+    'bytel' : 'Bouygues',
+    'sfr'   : 'SFR',
+    'free'  : 'Free',
+    }
+
+var themap = L.map('mapid').setView([48.835852, 2.388500], 13);
+
+L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {
+    attribution: '<a href="https://www.openstreetmap.org/about" target="_blank">© les contributeurs d’OpenStreetMap</a>',
+    maxZoom: 16,
+  }).addTo(themap);
+
+L.control.scale({ position: 'topright', imperial:false}).addTo(themap);
+
+var current_layer = null
+var urlmap = {};
+
+function geojsonMarkerOptions(feature) {
+    return {
+        radius: 8,
+        fillColor: opcolor[feature.properties.operateur],
+        color: "#000000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+    };
+}
+
+function onEachFeature(feature, layer) {
+    if (feature.properties && feature.properties.operateur) {
+        layer.bindPopup(
+            '<h5>' + opname[feature.properties.operateur] + '</h5>' +
+            '<p class="p-0 m-0"><b>Voix :     </b> ' + feature.properties.voix + '</p>' +
+            '<p class="m-0 p-0"><b> Données : </b> ' + feature.properties.data + '</p>' );
+    }
+}
+
+function loadTile(url) {
+    var e = document.getElementById('date-choice')
+    var url = e.options[e.selectedIndex].value;
+    var xhttp = new XMLHttpRequest();
+    xhttp.onload = function() {
+        if (!!current_layer) { current_layer.remove(); }
+        var geojson = JSON.parse(this.responseText);
+        current_layer = L.geoJSON(geojson, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, geojsonMarkerOptions(feature));
+            },
+            onEachFeature: onEachFeature });
+        current_layer.addTo(themap);
+    };
+    xhttp.open("GET", url, true);
+    xhttp.send();
+}
+
+function removeOptions(selectElement) {
+   var nboptions = selectElement.options.length - 1;
+   for(var i = nboptions; i >= 0; i--) {
+      selectElement.remove(i);
+   }
+}
+
+function load() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onload = function() {
+        var res = JSON.parse(this.responseText)['resources'];
+        var keys = [];
+        for (var i = 0; i < res.length; i++) {
+            if (res[i].format == 'geojson') {
+                date = res[i].title.substring(0, 10);
+                keys.push(date);
+                urlmap[date] = res[i].url;
+            }
+        }
+        keys.sort().reverse();
+        var select_menu = document.getElementById('date-choice');
+        removeOptions(select_menu);
+        for (var i = 0; i < keys.length; i++) {
+            var option = document.createElement("option");
+            option.text = keys[i];
+            option.value = urlmap[keys[i]];
+            select_menu.appendChild(option);
+        }
+        loadTile(urlmap[keys[0]]);
+    };
+    xhttp.open("GET", 'https://www.data.gouv.fr/api/1/datasets/5f7c7fae9cd6c79b58da3e20/?', true);
+    xhttp.setRequestHeader('X-Fields', '{resources{format,title,url}}');
+    xhttp.send();
+}
+
+load();
+</script>
+</body>
