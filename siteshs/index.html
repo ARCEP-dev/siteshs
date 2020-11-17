@@ -23,12 +23,12 @@
   <div id="container">
     <div id="sidebar" class="mb-1 row align-items-center">
       <img class="mx-3 logo" src="logo-arcep.svg" style="height:60px">
-      <div class="pb-2">
-        <span id="titlespan" class="align-middle" style="height: 100px;">Sites indisponibles</span>
+      <div class="pb-2 ml-3">
+        <span id="titlespan" class="align-middle" style="height: 100px;"> L'état des réseaux mobiles </span>
       </div>
       <hr>
-      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#mentionsLegales" data-show="true">
-        Mentions légales
+      <button type="button" class="btn btn-info" data-toggle="modal" data-target="#disclaimer" data-show="true">
+        En savoir plus
       </button>
       <div class="ml-3">
         <form class="form-inline">
@@ -43,17 +43,27 @@
   </div>
   
   <!-- "Modal" de mentions légales -->
-  <div class="modal fade" id="mentionsLegales" tabindex="-1" role="dialog" aria-labelledby="mentionsLegalesLabel" aria-hidden="true">
+  <div class="modal fade" id="disclaimer" tabindex="-1" role="dialog" aria-labelledby="disclaimerLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="mentionsLegalesLabel">Mentions légales</h5>
+          <h5 class="modal-title" id="disclaimerLabel">L'état des réseaux mobiles</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          Texte à compléter...
+          Depuis le 1er juillet 2018, les opérateurs mobiles ont l'obligation de publier et de maintenir à jour, sur leur site Internet,
+          la liste des stations de base qui ne fournissent pas de service de radiotéléphonie mobile (voix et SMS)
+          ou de service d’accès mobile à très haut débit (4G) pour cause de maintenance ou de panne.
+          Cette liste doit être publiée dans un format électronique ouvert et aisément réutilisable.<br>
+          <br>
+          Pour plus de détails, vous pouvez zoomer sur la carte, cliquer sur les points, ou encore rechercher une adresse en particulier.<br>
+          <br>
+          Les programmes de récupération et aggrégation des données opérateur sont disponibles en open source :<br>
+          <a href="https://github.com/ARCEP-dev/historiquePannes" target="_blank"> github.com/ARCEP-dev/historiquePannes </a><br>
+          Retrouvez toutes les informations concernant les obligations légales des opérateurs
+          sur le tableau de bord du New Deal Mobile : <a href="https://arcep.fr\new-deal" target="_blank"> arcep.fr\new-deal </a>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">C'est compris !</button>
@@ -258,7 +268,7 @@
   */
   window.onload = function() {
     initMap();
-    $("#mentionsLegales").modal('show');
+    $("#disclaimer").modal('show');
     ajaxGetDates();
   };
 </script>
