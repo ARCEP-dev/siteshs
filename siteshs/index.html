@@ -85,12 +85,14 @@
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 <script>
+  // Maps des couleurs opérateurs
   const opcolor = {
       'bytel' : '#67b4e2', // 33d1ff
       'free'  : '#084E8E', // 33ff52
       'orange': '#6561A8', // ffb200
       'sfr'   : '#ee5557', // ff0000
     };
+  // Maps des noms opérateurs
   const opname = {
       'bytel' : 'Bouygues Telecom',
       'free'  : 'Free',
@@ -102,10 +104,11 @@
   // Initialisation des variables
   var latitude = 46.49389;
   var longitude = 2.602778;
-  var map = null;
+  var map = null; // Pointeur vers la carte
   var GeoSearchControl = window.GeoSearch.GeoSearchControl;
   var OpenStreetMapProvider = window.GeoSearch.OpenStreetMapProvider;
-    
+  
+  // Constructeur de marqueur
   function geojsonMarkerOptions(feature) {
     return {
       radius: 8,
@@ -116,16 +119,8 @@
       fillOpacity: 0.8,
     };
   }
-
-  function onEachFeature(feature, layer) {
-    if (feature.properties && feature.properties.operateur) {
-      layer.bindPopup(
-        '<h5>' + opname[feature.properties.operateur] + '</h5>' +
-        '<p class="p-0 m-0"><b>Voix :     </b> ' + feature.properties.voix + '</p>' +
-        '<p class="m-0 p-0"><b> Données : </b> ' + feature.properties.data + '</p>' );
-    }
-  }
   
+  // Initialise la carte
   function initMap() {
     map = L.map('mapid', {
       fullscreenControl: {
@@ -206,27 +201,42 @@
   var current_layer = null
   var urlmap = {};
   
-  function loadTile(geojson) {
+  // Ajoute une popup à @layer avec les infos contenues dans @feature
+  function addFeaturePopup(feature, layer) {
+    if (feature.properties && feature.properties.operateur) {
+      layer.bindPopup(
+        '<h5>' + opname[feature.properties.operateur] + '</h5>' +
+        '<p class="p-0 m-0"><b>Voix :     </b> ' + feature.properties.voix + '</p>' +
+        '<p class="m-0 p-0"><b> Données : </b> ' + feature.properties.data + '</p>' );
+    }
+  }
+  
+  // Construit la couche des points à partir du geoJSON et l'ajoute à map
+  function loadLayer(geojson) {
     if (!!current_layer) { current_layer.remove(); }
     current_layer = L.geoJSON(geojson, {
       pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, geojsonMarkerOptions(feature));
       },
-      onEachFeature: onEachFeature });
+      onEachFeature: addFeaturePopup });
     current_layer.addTo(map);
   }
   
-  function ajaxGetTile(url) {
+  // Récupère les données geoJSON à partir de l' @url et charge la couche correspondante
+  function ajaxGetLayer(url) {
     var xhttp = new XMLHttpRequest();
-    xhttp.onload = function() { loadTile( JSON.parse(this.responseText) ); };
+    xhttp.onload = function() { loadLayer( JSON.parse(this.responseText) ); };
     xhttp.open("GET", url, true);
     xhttp.send();
   }
+  
+  // Charge la couche actuellement sélectionnée
   function ajaxGetCurrentTile() {
     var e = document.getElementById('date-choice')
-    ajaxGetTile( e.options[e.selectedIndex].value );
+    ajaxGetLayer( e.options[e.selectedIndex].value );
   }
 
+  // Retire toutes les options d'un élément DOM select
   function removeOptions(selectElement) {
     var nboptions = selectElement.options.length - 1;
     for(var i = nboptions; i >= 0; i--) {
@@ -234,7 +244,8 @@
     }
   }
 
-  function loadDates(data) {
+  // Charges les @cap dernières dates disponibles dans les données @data
+  function loadDates(data, cap) {
     var keys = [];
     for (var i = 0; i < data.length; i++) {
       if (data[i].format == 'geojson') {
@@ -246,30 +257,29 @@
     keys.sort().reverse();
     var select_menu = document.getElementById('date-choice');
     removeOptions(select_menu);
-    for (var i = 0; i < Math.min(15,keys.length); i++) {
+    for (var i = 0; i < Math.min(cap,keys.length); i++) {
       var option = document.createElement("option");
       option.text = keys[i];
       option.value = urlmap[keys[i]];
       select_menu.appendChild(option);
     }
-    ajaxGetTile(urlmap[keys[0]]);
+    ajaxGetLayer(urlmap[keys[0]]);
   }
-    
-  function ajaxGetDates() {
+  
+  // Récupère et charge les @cap dernières dates
+  function ajaxGetDates(cap) {
     var xhttp = new XMLHttpRequest();
-    xhttp.onload = function(){ loadDates( JSON.parse(this.responseText)['resources'] ); };
+    xhttp.onload = function(){ loadDates( JSON.parse(this.responseText)['resources'], cap); };
     xhttp.open("GET", 'https://www.data.gouv.fr/api/1/datasets/5f7c7fae9cd6c79b58da3e20/?', true);
     xhttp.setRequestHeader('X-Fields', '{resources{format,title,url}}');
     xhttp.send();
   }
 
-  /**
-  * Initialisation à exécuter lorsque le DOM est chargé
-  */
+  // Initialisation à exécuter lorsque le DOM est chargé
   window.onload = function() {
     initMap();
     $("#disclaimer").modal('show');
-    ajaxGetDates();
+    ajaxGetDates(15);
   };
 </script>
 </body>
