@@ -99,7 +99,7 @@
   // Table des couleurs opérateurs
   var current_style = 0;
   const opstyles = [
-      {'Bouygues Telecom':'#67b4e2','Free':'#084E8E','Orange':'#6561A8','SFR':'#ee5557'},
+      {'Bouygues Telecom':'#67b4e2','Free':'#4AE58D','Orange':'#6561A8','SFR':'#ee5557'},
       {'Bouygues Telecom':'#33d1ff','Free':'#33ff52','Orange':'#ffb200','SFR':'#ff0000'}
     ];
   function getStyle() { return opstyles[ current_style ]; }
@@ -205,13 +205,60 @@
   var current_layer = null
   var urlmap = {};
   
+  function isnull(s) { return !(s == 'OK' || s == 'HS'); }
+  
+  // Message de statut de la voix/SMS
+  function message_voix(p) {
+    if ( isnull(p.voix2g) && isnull(p.voix3g) && isnull(p.voix4g) ) {
+      if (p.voix == 'HS') { return 'Hors service'; } else { return 'OK'; }
+    } else if (p.voix3g == 'OK') {
+      if (p.voix2g == 'HS') { return 'OK (2G HS)'; }
+      else                  { return 'OK'; }
+    } else if (p.voix3g == 'HS') {
+      if (p.voix2g == 'OK') { return 'Dégradé (3G HS)'; }
+      else                  { return 'Hors service'; }
+    } else {
+      if      (p.voix2g == 'OK') { return 'OK'; }
+      else if (p.voix2g == 'HS') { return 'Hors service'; }
+      else                       { return '--'; }
+    }
+  }
+  
+  // Message de statut de la data
+  function message_data(p) {
+    if ( isnull(p.data3g) && isnull(p.data4g) && isnull(p.data5g) ) {
+      if (p.data == 'HS') { return 'Hors service'; } else { return 'OK'; }
+    } else if (p.data4g == 'OK') {
+      if      (p.data5g == 'HS') { return 'Dégradé (5G HS)'; }
+      else if (p.data3g == 'HS') { return 'OK (3G HS)'; }
+      else                       { return 'OK'; }
+    } else if (p.data4g == 'HS') {
+      if (p.data3g == 'OK') {
+        if (p.data5g == 'HS')    { return 'Dégradé (4G & 5G HS)'; }
+        else                     { return 'Dégradé (4G HS)'; }
+      } else if (p.data5g == 'OK') {
+        if (p.data3g == 'HS')    { return 'Dégradé (3G & 5G HS)'; }
+        else                     { return 'Dégradé (4G HS)'; }
+      } else                     { return 'Hors Service'; }
+    } else {
+      if (p.voix3g == 'OK') {
+        if (p.voix5g == 'HS')    { return 'Dégradé (5G HS)'; }
+        else                     { return 'OK'; }
+      } else if (p.voix3g == 'HS') {
+        if (p.voix5g == 'OK')    { return 'Dégradé (3G HS)'; }
+        else                     { return 'Hors Service'; }
+      } else if (p.voix5g=='HS') { return 'Hors Service'; }
+      else                       { return 'OK'; }
+    }
+  }
+  
   // Ajoute une popup à @layer avec les infos contenues dans @feature
   function addFeaturePopup(feature, layer) {
     if (feature.properties && feature.properties.operateur) {
       layer.bindPopup(
         '<h5>' + getName(feature.properties.operateur) + '</h5>' +
-        '<p class="p-0 m-0"><b>Voix :     </b> ' + feature.properties.voix + '</p>' +
-        '<p class="m-0 p-0"><b> Données : </b> ' + feature.properties.data + '</p>' );
+        '<p class="p-0 m-0"><b>Voix :     </b> ' + message_voix(feature.properties) + '</p>' +
+        '<p class="m-0 p-0"><b> Données : </b> ' + message_data(feature.properties) + '</p>' );
     }
   }
   
