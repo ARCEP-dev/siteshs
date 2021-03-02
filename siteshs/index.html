@@ -17,7 +17,7 @@
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css" />
-  <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+  <script src="https://code.jquery.com/jquery-2.0.3.min.js"></script>
 </head>
 <body>
   <div id="container">
@@ -44,7 +44,7 @@
   
   <!-- "Modal" de mentions légales -->
   <div class="modal fade" id="disclaimer" tabindex="-1" role="dialog" aria-labelledby="disclaimerLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="disclaimerLabel">L'état des réseaux mobiles</h5>
@@ -133,7 +133,7 @@
     }).setView([latitude, longitude], 6);
 
     // On ajoute le fond de carte
-    var osmLayer = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    var osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">les contributeurs d’OpenStreetMap</a>',
         maxZoom: 16,
