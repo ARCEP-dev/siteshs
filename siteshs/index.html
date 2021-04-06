@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.66.2/dist/L.Control.Locate.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@latest/assets/css/leaflet.css" />
   <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+  <link rel="stylesheet" href="leaflet-legend.css" />
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css" />
@@ -79,7 +80,8 @@
   <script src="https://unpkg.com/leaflet-geosearch@latest/dist/geosearch.umd.js"></script>
   <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-hash/0.2.1/leaflet-hash.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-easyprint@2.1.9/dist/bundle.js"></script>  
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-easyprint@2.1.9/dist/bundle.js"></script>
+  <script src="leaflet-legend.js"></script>
   
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
@@ -112,6 +114,15 @@
   var GeoSearchControl = window.GeoSearch.GeoSearchControl;
   var OpenStreetMapProvider = window.GeoSearch.OpenStreetMapProvider;
   
+  // Un "groupe de couche" par opérateur
+  const layergroups = {'Bouygues Telecom':new L.layerGroup(),'Free':new L.layerGroup(),'Orange':new L.layerGroup(),'SFR':new L.layerGroup()};
+  function getLayer(s) { return layergroups[getName(s)]; }
+  function clearAllLayers() {
+    for (const n in layergroups) {
+      layergroups[n].clearLayers();
+    };
+  }
+  
   // Constructeur de marqueur
   function geojsonMarkerOptions(feature) {
     return {
@@ -133,15 +144,15 @@
     }).setView([latitude, longitude], 6);
 
     // On ajoute le fond de carte
-    var osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">les contributeurs d’OpenStreetMap</a>',
         maxZoom: 16,
-      });
+      }).addTo(map);
 
     // On ajoute une échelle en haut à droite
-    var scale = L.control.scale({ position: 'topright', imperial:false});
-
+    L.control.scale({ position: 'topright', imperial:false}).addTo(map);
+    
     var hash = new L.Hash(map);
 
     // On gère la géolocalisation de l'utilisateur
@@ -155,7 +166,7 @@
       showPopup: false,
       keepCurrentZoomLevel: true
     });
-
+    
     // On définit le fournisseur sur lequel on va s'appuyer pour effectuer les recherches d'adresse
     var provider = new OpenStreetMapProvider({
       params: { countrycodes: 'fr' },
@@ -180,37 +191,40 @@
       keepResult: true
     });
     
-    /**
-    * On ajoute la légende à la carte
-    * @param la carte où la légende sera ajoutée
-    */
-    var legend = L.control( { position: 'bottomleft' } );
-    legend.onAdd = function(map) {
-      var div = L.DomUtil.create('div', 'info legend');
-      // On boucle sur toutes les valeurs et on génère une étiquette avec la bonne couleur pour chaque valeur
-      opnames.forEach(function(name) {
-        div.innerHTML += '<i style="background:' + getColor(name) + '"></i> ' + name + '<br>';
-      });
-      return div;
-    };
+    // On ajoute la légende à la carte
+    const legend = L.control.Legend({
+      position: 'bottomleft',
+      opacity:0.8,
+      symbolWidth:18,
+      legends: opnames.map(function(name) {
+        return {
+          label: getName(name),
+          type: "circle",
+          color: "black",
+          fillColor: getColor(name),
+          fillOpacity:0.7,
+          weight:1,
+          layers: getLayer(name),
+        };
+      }),
+    }).addTo(map);
     
     // On ajoute toutes les couches à la carte
-    osmLayer.addTo(map);
-    scale.addTo(map);
-    legend.addTo(map);
+    for (const c in layergroups) { layergroups[c].addTo(map); }
     map.addControl(searchControl);
     location.addTo(map);
   }
   
-  var current_layer = null
   var urlmap = {};
   
   function isnull(s) { return !(s == 'OK' || s == 'HS'); }
   
   function status_code(st) {
-         if (st == 'OK') { return 'O'; }
-    else if (st == 'HS') { return 'X'; }
-    else                 { return '_'; }
+    switch(st) {
+      case 'OK': return 'O';
+      case 'HS': return 'X';
+      default  : return '_';
+    }
   }
   
   // Message de statut de la voix/SMS
@@ -278,18 +292,19 @@
         '<h5>' + getName(feature.properties.operateur) + '</h5>' +
         '<p class="p-0 m-0"><b>Voix :   </b> ' + message_voix(feature.properties) + '</p>' +
         '<p class="m-0 p-0"><b>Données :</b> ' + message_data(feature.properties) + '</p>' );
+      getLayer(feature.properties.operateur).addLayer(layer);
     }
   }
   
   // Construit la couche des points à partir du geoJSON et l'ajoute à map
   function loadLayer(geojson) {
-    if (!!current_layer) { current_layer.remove(); }
-    current_layer = L.geoJSON(geojson, {
+    clearAllLayers();
+    L.geoJSON(geojson, {
       pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, geojsonMarkerOptions(feature));
       },
-      onEachFeature: addFeaturePopup });
-    current_layer.addTo(map);
+      onEachFeature: addFeaturePopup
+    });
   }
   
   // Récupère les données geoJSON à partir de l' @url et charge la couche correspondante
@@ -302,7 +317,7 @@
   
   // Charge la couche actuellement sélectionnée
   function ajaxGetCurrentTile() {
-    var e = document.getElementById('date-choice')
+    var e = document.getElementById('date-choice');
     ajaxGetLayer( e.options[e.selectedIndex].value );
   }
 

@@ -38,28 +38,87 @@ html, body, #container {
   height: calc(100% - 60px);
 }
 
-.info {
-  /* Informations */
-  padding: 6px 8px;
+.leaflet-legend {
+  /* Légende */
   font: 14px/16px Arial, Helvetica, sans-serif;
   background: white;
   background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
-}
-
-.legend {
-  /* Légende */
   line-height: 18px;
   color: #555;
+  padding: 4px 6px;
 }
 
-.legend i {
-  width: 16px;
-  height: 16px;
+.leaflet-legend-title {
+  display:none;
+}
+
+.leaflet-legend-column {
   float: left;
-  margin-right: 8px;
-  opacity: 0.7;
+}
+
+.leaflet-legend-item {
+  display: table;
+  margin: 2px 0;
+}
+
+.leaflet-legend-item span {
+  vertical-align: middle;
+  display: table-cell;
+  word-break: keep-all;
+  white-space: nowrap;
+  background-color: transparent;
+  text-align: left;
+}
+
+.leaflet-legend-item-clickable {
+  cursor: pointer;
+}
+
+.leaflet-legend-item-inactive span {
+  color: #cccccc;
+}
+
+.leaflet-legend-item-inactive i img, .leaflet-legend-item-inactive i canvas {
+  opacity: 0.3;
+  /*
+  color: #000000;
+  -webkit-filter: grayscale(100%);
+  -moz-filter: grayscale(100%);
+  -ms-filter: grayscale(100%);
+  -o-filter: grayscale(100%);
+  filter: grayscale(100%);
+  filter: gray;
+  */
+}
+
+.leaflet-legend-item i {
+  display: inline-block;
+  padding: 0px 0px 0px 0px;
+  margin: 0px 5px 0px 0px;
+  position: relative;
+  vertical-align: middle;
+}
+
+.leaflet-legend-contents {
+  display: none;
+  padding:0px;
+  margin:0px;
+}
+
+.leaflet-legend-expanded .leaflet-legend-contents {
+  display: block;
+}
+
+.leaflet-legend-contents img {
+  position: absolute;
+}
+
+.leaflet-legend-contents:after {
+  content: "";
+  display: block;
+  clear: both;
 }
   </style>
 </head>
@@ -82,14 +141,246 @@ html, body, #container {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
   <script src="https://unpkg.com/leaflet-geosearch@latest/dist/geosearch.umd.js"></script>
   
-  
   <script src="https://cdn.jsdelivr.net/npm/leaflet-easyprint@2.1.9/dist/bundle.js"></script>  
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-<!--
-  -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
  
- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+<script>
+(function (factory, window) {
+    // define an AMD module that relies on 'leaflet'
+    if (typeof define === "function" && define.amd) {
+        define(["leaflet"], factory);
+
+        // define a Common JS module that relies on 'leaflet'
+    } else if (typeof exports === "object") {
+        module.exports = factory(require("leaflet"));
+    }
+
+    // attach your plugin to the global 'L' variable
+    if (typeof window !== "undefined" && window.L) {
+        factory(L);
+    }
+})(function (L) {
+    class LegendSymbol {
+      constructor(control, container, legend) {
+        this._control = control;
+        this._container = container;
+        this._legend = legend;
+        this._width = this._control.options.symbolWidth;
+        this._height = this._control.options.symbolHeight;
+      }
+    }
+
+    class GeometricSymbol extends LegendSymbol {
+      constructor(control, container, legend) {
+        super(control, container, legend);
+        this._canvas = this._buildCanvas();
+        if (this._drawSymbol) { this._drawSymbol(); }
+        this._style();
+      }
+
+      _buildCanvas() {
+        var canvas = L.DomUtil.create("canvas", null, this._container);
+        canvas.height = this._control.options.symbolHeight;
+        canvas.width = this._control.options.symbolWidth;
+        return canvas;
+      }
+
+      _drawSymbol() {}
+
+      _style() {
+        var ctx = (this._ctx = this._canvas.getContext("2d"));
+        if (this._legend.fill || this._legend.fillColor) {
+          ctx.globalAlpha = this._legend.fillOpacity || 1;
+          ctx.fillStyle = this._legend.fillColor || this._legend.color;
+          ctx.fill(this._legend.fillRule || "evenodd");
+        }
+
+        if (this._legend.stroke || this._legend.color) {
+          if (this._legend.dashArray) {
+            ctx.setLineDash(this._legend.dashArray || []);
+          }
+          ctx.globalAlpha = this._legend.opacity || 1.0;
+          ctx.lineWidth = this._legend.weight || 2;
+          ctx.strokeStyle = this._legend.color || "#3388ff";
+          ctx.lineCap = this._legend.lineCap || "round";
+          ctx.lineJoin = this._legend.lineJoin || "round";
+          ctx.stroke();
+        }
+      }
+
+      rescale() {}
+
+      center() {}
+    }
+
+    class CircleSymbol extends GeometricSymbol {
+      _drawSymbol() {
+        var ctx = (this._ctx = this._canvas.getContext("2d"));
+        var legend = this._legend;
+        var linelWeight = legend.weight || 3;
+        var centerX = this._control.options.symbolWidth / 2;
+        var centerY = this._control.options.symbolHeight / 2;
+        var maxRadius = Math.min(centerX, centerY) - linelWeight;
+        var radius = maxRadius;
+        if (legend.radius) {
+          radius = Math.min(legend.radius, maxRadius);
+        }
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
+      }
+    }
+
+    L.Control.Legend = L.Control.extend({
+        options: {
+            position: "topleft",
+            title: "Legend",
+            legends: [],
+            symbolWidth: 24,
+            symbolHeight: 24,
+            opacity: 1.0,
+            column: 1,
+            collapsed: false,
+        },
+
+        initialize: function (options) {
+            L.Util.setOptions(this, options);
+            this._legendSymbols = [];
+            this._buildContainer();
+        },
+
+        onAdd: function (map) {
+            this._map = map;
+            this._initLayout();
+            return this._container;
+        },
+
+        _buildContainer: function () {
+            this._container = L.DomUtil.create("div", "leaflet-legend leaflet-bar leaflet-control");
+            this._container.style.backgroundColor = "rgba(255,255,255, " + this.options.opacity + ")";
+
+            this._contents = L.DomUtil.create("section", "leaflet-legend-contents", this._container);
+            this._link = L.DomUtil.create("a", "leaflet-legend-toggle", this._container);
+            this._link.title = "Legend";
+            this._link.href = "#";
+
+            var title = L.DomUtil.create("h3", "leaflet-legend-title", this._contents);
+            title.innerText = this.options.title || "Legend";
+
+            var len = this.options.legends.length;
+            var colSize = Math.ceil(len / this.options.column);
+            var legendContainer = this._contents;
+            for (var i = 0; i < len; i++) {
+                if (i % colSize == 0) {
+                    legendContainer = L.DomUtil.create("div", "leaflet-legend-column", this._contents);
+                }
+                var legend = this.options.legends[i];
+                this._buildLegendItems(legendContainer, legend);
+            }
+        },
+
+        _buildLegendItems: function (legendContainer, legend) {
+            var legendItemDiv = L.DomUtil.create("div", "leaflet-legend-item", legendContainer);
+            if (legend.inactive) {
+                L.DomUtil.addClass(legendItemDiv, "leaflet-legend-item-inactive");
+            }
+            var symbolContainer = L.DomUtil.create("i", null, legendItemDiv);
+
+            var legendSymbol;
+            if (legend.type === "circle") {
+                legendSymbol = new CircleSymbol(this, symbolContainer, legend);
+            } else {
+                L.DomUtil.remove(legendItemDiv);
+                return;
+            }
+            this._legendSymbols.push(legendSymbol);
+
+            symbolContainer.style.width = this.options.symbolWidth + "px";
+            symbolContainer.style.height = this.options.symbolHeight + "px";
+
+            var legendLabel = L.DomUtil.create("span", null, legendItemDiv);
+            legendLabel.innerText = legend.label;
+            if (legend.layers) {
+                L.DomUtil.addClass(legendItemDiv, "leaflet-legend-item-clickable");
+                L.DomEvent.on(
+                    legendItemDiv,
+                    "click",
+                    function () {
+                        this._toggleLegend.call(this, legendItemDiv, legend.layers);
+                    },
+                    this
+                );
+            }
+        },
+
+        _initLayout: function () {
+            L.DomEvent.disableClickPropagation(this._container);
+            L.DomEvent.disableScrollPropagation(this._container);
+
+            if (this.options.collapsed) {
+                this._map.on("click", this.collapse, this);
+
+                L.DomEvent.on(
+                    this._container,
+                    {
+                        mouseenter: this.expand,
+                        mouseleave: this.collapse,
+                    },
+                    this
+                );
+            } else {
+                this.expand();
+            }
+        },
+
+        _toggleLegend: function (legendDiv, layers) {
+            if (L.DomUtil.hasClass(legendDiv, "leaflet-legend-item-inactive")) {
+                L.DomUtil.removeClass(legendDiv, "leaflet-legend-item-inactive");
+                if (L.Util.isArray(layers)) {
+                    for (var i = 0, len = layers.length; i < len; i++) {
+                        this._map.addLayer(layers[i]);
+                    }
+                } else {
+                    this._map.addLayer(layers);
+                }
+            } else {
+                L.DomUtil.addClass(legendDiv, "leaflet-legend-item-inactive");
+                if (L.Util.isArray(layers)) {
+                    for (var i = 0, len = layers.length; i < len; i++) {
+                        this._map.removeLayer(layers[i]);
+                    }
+                } else {
+                    this._map.removeLayer(layers);
+                }
+            }
+        },
+
+        expand: function () {
+            this._link.style.display = "none";
+            L.DomUtil.addClass(this._container, "leaflet-legend-expanded");
+            for (var legendSymbol of this._legendSymbols) {
+                legendSymbol.rescale();
+            }
+            return this;
+        },
+
+        collapse: function () {
+            this._link.style.display = "block";
+            L.DomUtil.removeClass(this._container, "leaflet-legend-expanded");
+            return this;
+        },
+
+        redraw: function () {
+            L.DomUtil.empty(this._contents);
+            this._buildLegendItems();
+        },
+    });
+
+    L.control.legend = L.control.Legend = function (options) {
+        return new L.Control.Legend(options);
+    };
+}, window);
+</script>
 <script>
   // Table de conversion des noms opérateurs
   const opname = {
@@ -118,6 +409,14 @@ html, body, #container {
   var GeoSearchControl = window.GeoSearch.GeoSearchControl;
   var OpenStreetMapProvider = window.GeoSearch.OpenStreetMapProvider;
   
+  const layergroups = {'Bouygues Telecom':new L.layerGroup(),'Free':new L.layerGroup(),'Orange':new L.layerGroup(),'SFR':new L.layerGroup()};
+  function getLayerGroup(s) { return layergroups[getName(s)]; }
+  function clearAllLayers() {
+    for (const n in layergroups) {
+      layergroups[n].clearLayers();
+    };
+  }
+  
   // Constructeur de marqueur
   function geojsonMarkerOptions(feature) {
     return {
@@ -134,14 +433,14 @@ html, body, #container {
     map = L.map('mapid', {}).setView([46.49389, 2.602778], 6);
 
     // On ajoute le fond de carte
-    var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
       {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">les contributeurs d’OpenStreetMap</a>',
         maxZoom: 16,
-      });
+      }).addTo(map);
 
     // On ajoute une échelle en haut à droite
-    var scale = L.control.scale({ position: 'topright', imperial:false});
+    L.control.scale({ position: 'topright', imperial:false}).addTo(map);
 
     // On définit le fournisseur sur lequel on va s'appuyer pour effectuer les recherches d'adresse
     var provider = new OpenStreetMapProvider({
@@ -167,24 +466,27 @@ html, body, #container {
       keepResult: true
     });
     
-    /**
-    * On ajoute la légende à la carte
-    * @param la carte où la légende sera ajoutée
-    */
-    var legend = L.control( { position: 'bottomleft' } );
-    legend.onAdd = function(map) {
-      var div = L.DomUtil.create('div', 'info legend');
-      // On boucle sur toutes les valeurs et on génère une étiquette avec la bonne couleur pour chaque valeur
-      opnames.forEach(function(name) {
-        div.innerHTML += '<i style="background:' + getColor(name) + '"></i> ' + name + '<br>';
-      });
-      return div;
-    };
+    // On ajoute la légende à la carte
+    L.control.Legend({
+      position: 'bottomleft',
+      opacity:0.8,
+      symbolWidth:18,
+      legends: opnames.map(function(name) {
+        return {
+          label: getName(name),
+          type: "circle",
+          color: "black",
+          fillColor: getColor(name),
+          fillOpacity:0.7,
+          weight:1,
+          layers: getLayerGroup(name),
+        };
+      }),
+    }).addTo(map);
+    
     
     // On ajoute toutes les couches à la carte
-    osmLayer.addTo(map);
-    scale.addTo(map);
-    legend.addTo(map);
+    for (const c in layergroups) { layergroups[c].addTo(map); }
     map.addControl(searchControl);
   }
   
@@ -194,9 +496,11 @@ html, body, #container {
   function isnull(s) { return !(s == 'OK' || s == 'HS'); }
   
   function status_code(st) {
-         if (st == 'OK') { return 'O'; }
-    else if (st == 'HS') { return 'X'; }
-    else                 { return '_'; }
+    switch(st) {
+      case 'OK': return 'O';
+      case 'HS': return 'X';
+      default  : return '_';
+    }
   }
   
   // Message de statut de la voix/SMS
@@ -264,18 +568,19 @@ html, body, #container {
         '<h5>' + getName(feature.properties.operateur) + '</h5>' +
         '<p class="p-0 m-0"><b>Voix :   </b> ' + message_voix(feature.properties) + '</p>' +
         '<p class="m-0 p-0"><b>Données :</b> ' + message_data(feature.properties) + '</p>' );
+      getLayerGroup(feature.properties.operateur).addLayer(layer);
     }
   }
   
   // Construit la couche des points à partir du geoJSON et l'ajoute à map
   function loadLayer(geojson) {
-    if (!!current_layer) { current_layer.remove(); }
-    current_layer = L.geoJSON(geojson, {
-      pointToLayer: function (feature, latlng) {
-        return L.circleMarker(latlng, geojsonMarkerOptions(feature));
-      },
-      onEachFeature: addFeaturePopup });
-    current_layer.addTo(map);
+    clearAllLayers();
+    L.geoJSON(geojson, {
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, geojsonMarkerOptions(feature));
+        },
+        onEachFeature: addFeaturePopup
+      });
   }
   
   // Récupère les données geoJSON à partir de l' @url et charge la couche correspondante
