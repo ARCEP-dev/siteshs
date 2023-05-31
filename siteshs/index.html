@@ -18,27 +18,32 @@
 </head>
 <body>
   <div id="container">
-    <div id="sidebar" class="mb-1 row align-items-center">
-      <img class="mx-3 logo" src="logo-arcep.svg" style="height:60px">
-      <div class="pb-2 ml-3">
-        <span id="titlespan" class="align-middle" style="height: 100px;"> L'état des réseaux mobiles </span>
+    <div id="sidebar" class="row align-items-center">
+      <img class="logo" src="logo-arcep.svg" style="height: 3.2rem" title="Arcep&nbsp;: L'état des réseaux mobiles"/>
+
+      <div class="pb-2 ml-3 d-none d-sm-block">
+        <span id="titlespan" class="align-middle">L'état des réseaux mobiles</span>
       </div>
-      <hr>
-      <button type="button" class="btn btn-info" data-toggle="modal" data-target="#disclaimer" data-show="true">
-        En savoir plus
+      
+      <hr class="d-none d-xl-block"/>
+
+      <button type="button" class="ml-3 btn btn-info" data-toggle="modal" data-target="#disclaimer" data-show="true" title="En savoir plus">
+        <i class="fa fa-question d-xl-none"></i>&nbsp;<span class="d-none d-xl-inline">En savoir plus</span>
       </button>
+
       <div class="ml-3">
         <form class="form-inline">
-          <div class="form-group">
-            <label for="date-choice" class="m-2">Choisissez une date:</label>
+          <div class="form-group mb-0">
+            <label for="date-choice" class="d-none d-sm-inline-block">Choisissez une date:</label>
             <select name="date" id="date-choice" class="form-control m-2" onchange="ajaxGetCurrentTile()"></select>
           </div>
         </form>
       </div>
-      <div class="row align-items-center ml-4 mr-3">
-      <img id="bird" class="logo" src="jalerte.png" style="height:60px">
-      <!--Un problème de réseau inhabituel ? -->
-      <button type="button" id="birdie-button" class="btn btn-danger" onclick="jalerte()"> J'alerte l'Arcep ! </button>
+
+      <div class="row align-items-center ml-3 mr-3">
+        <img id="bird" class="logo" src="jalerte.png" title="J'alerte l'Arcep !">
+        <!--Un problème de réseau inhabituel ? -->
+        <button type="button" id="birdie-button" class="btn btn-danger" onclick="jalerte()">J'alerte l'Arcep !</button>
       </div>
     </div>
     <div id="mapid"></div>
