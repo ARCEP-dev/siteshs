@@ -1,24 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <title> L'état des réseaux mobiles </title>
+  <title>L'état des réseaux mobiles</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="favicon.ico" />
-  <!-- Leaflet and Bootstrap: CSS style -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-    crossorigin=""/>
-    
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.66.2/dist/L.Control.Locate.min.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@latest/assets/css/leaflet.css" />
-  <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
-  <link rel="stylesheet" href="leaflet-legend.css" />
   
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/font-awesome@4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.css" integrity="sha384-s1weW3rLvQEcQo1OenCYWESkNoaaT6C995dZ4jgUAt+qkjhTNQoN8mhu6ZwQzWNS" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.8.0/assets/css/leaflet.css" integrity="sha384-YkLkphKiabh88FkMxl5Q7kcNXJjWzek+NxJWKCa1MjRdsrDpCMU4Ag0SOlir2DIm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-fullscreen@1.0.2/dist/leaflet.fullscreen.css" integrity="sha384-t17w2haSDwLp3KSAOHF7+VI9q2maRMLDhnIyU/JasjeWyxcN3YOcrD7T95CiJSWE" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="leaflet-legend.css" />
   <link rel="stylesheet" href="style.css" />
-  <script src="https://code.jquery.com/jquery-2.0.3.min.js"></script>
 </head>
 <body>
   <div id="container">
@@ -154,20 +150,22 @@
     </form>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.67.0/src/L.Control.Locate.min.js"></script>
-  <script src="https://unpkg.com/leaflet-geosearch@latest/dist/geosearch.umd.js"></script>
-  <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-hash/0.2.1/leaflet-hash.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-easyprint@2.1.9/dist/bundle.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet-ajax@2.1.0/dist/leaflet.ajax.min.js" integrity="sha384-sKs8ZrrxyJoElcPVznZwGpUTTXvkMYfHYxdIFzO8Hd0TA6emONMj8BwnsFf+6cZ/" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.js" integrity="sha384-XF7O0sxpctKl96bCyBgbgdQbnHDg/ek0LdbWrVUmx/LPh4EDtdIsGculgF93z6wW" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet-geosearch@3.8.0/dist/geosearch.umd.js" integrity="sha384-7TExuR4VVqrFERW8X9RBNAPOKS05uUR3rJikLtJXUSnq3AX4zI7mbkMuZ+kqHBI9" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet-fullscreen@1.0.2/dist/Leaflet.fullscreen.min.js" integrity="sha384-FpPcEXyP4TQdyqUB2eInJM0/JklDW4T4qNuvDQdaNmkQ6KjY+KOyoUZmscxOIfZ5" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet-hash@0.2.1/leaflet-hash.js" integrity="sha384-2V+X2eD8Nz+G+FVKmPS5XkcMt40qrSGaHSoV8Ny7VAvPnHMfnLgrZ6qvNZVJ2ycb" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet-easyprint@2.1.9/dist/bundle.js" integrity="sha384-wf9ute6lQpx/ed7uU0TgJU56BOH/crnOVq13XbOxZKBpmB15XJMsdwfhZoommN+4" crossorigin="anonymous"></script>
+
   <script src="leaflet-legend.js"></script>
   
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.7.0/dist/jquery.slim.min.js" integrity="sha384-w5y/xIeYixWvfM+A1cEbmHPURnvyqmVg5eVENruEdDjcyRLUSNej7512JQGspFUr" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
+
   <script src="arcepmap.js"></script>
+
 <script>
   // Info de connexion à J'Alerte
   jalerte_connexion = [ "https://jalerteapi.arcep.fr/api/v1/alerte/pre-saisie", '5b83781c3fa611fae8aaf3a60d5f74eb5005665d27c2cff1a1dee500f054743a'];
