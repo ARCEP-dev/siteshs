@@ -31,10 +31,12 @@ class ArcepMap {
   initialise() {
     let self = this;
     this.map = L.map(this.mapid, { // Empty dict to remove full screen button
+      attributionControl: false,
       fullscreenControl: { pseudoFullscreen: false }, // if true, fullscreen to page width and height
       maxZoom: self.maxzoom,
       maxBounds: metrobounds(0)
     }).setView([self.vue_lat, self.vue_long], self.vue_zoom);
+    L.control.attribution({prefix: 'Leaflet'}).addTo(this.map); // pour éviter le drapeau de soutien Ukrainien
     
     // Canvas renderer
     this.renderer = L.canvas({ padding: 0.5 });
@@ -43,7 +45,7 @@ class ArcepMap {
     L.tileLayer(
       this.url_template,
       {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">les contributeurs d’OpenStreetMap</a>',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" title="les contributeurs OpenStreeMap">OpenStreetMap</a>',
         maxZoom: self.maxzoom,
       }).addTo(this.map);
 

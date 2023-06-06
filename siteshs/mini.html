@@ -4,14 +4,12 @@
   <title>Sites indisponibles</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Leaflet and Bootstrap: CSS style -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-    crossorigin=""/>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@latest/assets/css/leaflet.css" />
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-2.0.3.min.js"></script>
+  
+  <link rel="stylesheet" href="https://unpkg.com/font-awesome@4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.8.0/assets/css/leaflet.css" integrity="sha384-YkLkphKiabh88FkMxl5Q7kcNXJjWzek+NxJWKCa1MjRdsrDpCMU4Ag0SOlir2DIm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  
   <style>
 html, body, #container {
   height: 100%;
@@ -19,12 +17,6 @@ html, body, #container {
   overflow: hidden;
 }
 
-#sidebar {
-  float: top;
-  width: 100%;
-  max-height: 100%;
-  height: 60px;
-}
 #titlespan {
     font-size: 36px;
     font-weight: 650;
@@ -35,14 +27,6 @@ html, body, #container {
 #mapid {
   z-index:1;
   width: 100%;
-    /* Firefox */
-    height: -moz-calc(100vh - 60px);
-    /* WebKit */
-    height: -webkit-calc(100% - 60px);
-    /* Opera */
-    height: -o-calc(100% - 60px);
-    /* Standard */
-    height: calc(100% - 60px);
 }
 
 .leaflet-container.crosshair-cursor-enabled {
@@ -148,7 +132,7 @@ html, body, #container {
   </style>
 </head>
 <body>
-  <div id="container">
+  <div id="container" class="d-flex flex-column">
     <div id="sidebar" class="row align-items-center">
       <div class="col-sm-5 ml-3">
         <form class="form-inline">
@@ -158,15 +142,8 @@ html, body, #container {
           </div>
         </form>
       </div>
-      <!--Un problème de réseau inhabituel ?
-      <hr>
-      <div class="row align-items-center ml-4 mr-3">
-        <img id="bird" class="logo" src="jalerte.png" style="height:60px">
-        <button type="button" id="birdie-button" class="btn btn-danger" onclick="jalerte()"> J'alerte l'Arcep ! </button>
-      </div>
-      -->
     </div>
-    <div id="mapid"></div>
+    <div id="mapid" class="flex-fill"></div>
   </div>
   
   <!-- "Modal" de warning J'alerte l'Arcep -->
@@ -244,16 +221,13 @@ html, body, #container {
     </form>
   </div>  
   
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
-  <script src="https://unpkg.com/leaflet-geosearch@latest/dist/geosearch.umd.js"></script>
-  
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-easyprint@2.1.9/dist/bundle.js"></script>  
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
- 
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet-ajax@2.1.0/dist/leaflet.ajax.min.js" integrity="sha384-sKs8ZrrxyJoElcPVznZwGpUTTXvkMYfHYxdIFzO8Hd0TA6emONMj8BwnsFf+6cZ/" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet-geosearch@3.8.0/dist/geosearch.umd.js" integrity="sha384-7TExuR4VVqrFERW8X9RBNAPOKS05uUR3rJikLtJXUSnq3AX4zI7mbkMuZ+kqHBI9" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet-easyprint@2.1.9/dist/bundle.js" integrity="sha384-wf9ute6lQpx/ed7uU0TgJU56BOH/crnOVq13XbOxZKBpmB15XJMsdwfhZoommN+4" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery@3.7.0/dist/jquery.slim.min.js" integrity="sha384-w5y/xIeYixWvfM+A1cEbmHPURnvyqmVg5eVENruEdDjcyRLUSNej7512JQGspFUr" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
 <script>
 (function (factory, window) {
     // define an AMD module that relies on 'leaflet'
@@ -523,10 +497,12 @@ class ArcepMap {
   initialise() {
     let self = this;
     this.map = L.map(this.mapid, { // Empty dict to remove full screen button
+      attributionControl: false,
       fullscreenControl: { pseudoFullscreen: false }, // if true, fullscreen to page width and height
       maxZoom: self.maxzoom,
       maxBounds: metrobounds(0)
     }).setView([self.vue_lat, self.vue_long], self.vue_zoom);
+    L.control.attribution({prefix: 'Leaflet'}).addTo(this.map); // pour éviter le drapeau de soutien Ukrainien
     
     // Canvas renderer
     this.renderer = L.canvas({ padding: 0.5 });
@@ -535,7 +511,7 @@ class ArcepMap {
     L.tileLayer(
       this.url_template,
       {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">les contributeurs d’OpenStreetMap</a>',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" title="les contributeurs OpenStreeMap">OpenStreetMap</a>',
         maxZoom: self.maxzoom,
       }).addTo(this.map);
 
